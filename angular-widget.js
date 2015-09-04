@@ -163,9 +163,12 @@ angular.module("angularWidgetInternal").directive("ngWidget", [ "$http", "$templ
                             var widgetElement = angular.element(response);
                             var modules = [ "angularWidgetOnly", "angularWidget", widgetConfigSection, manifest.module ].concat(manifest.config || []);
                             scope.$emit("widgetLoading");
+                            //remove injector to avoid an exception while bootstrapping
+                            widgetElement.data('$injector', null);
+                            //we need to append element to the DOM before boostrapping because $compile does not work with detached DOM element.
+                            element.append(widgetElement);
                             injector = angular.bootstrap(widgetElement, modules);
                             handleNewInjector();
-                            element.append(widgetElement);
                         } catch (e) {
                             $log.error(e);
                             scope.$emit("widgetError");
